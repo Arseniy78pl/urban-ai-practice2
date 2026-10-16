@@ -10,11 +10,16 @@ authors = [
 ] # не забудьте поменять на свое имя :)
 description = "IDU research package boilerplate"
 readme = "README.rst"
-requires-python = ">=3.10"
+requires-python = ">=3.10,<3.13" # BlocksNet 1.0.0a9 (через iduedu 0.4.1) не ставится на Python 3.13
 license = { file = "LICENCE" }
 
 dependencies = [ # здесь необходимо вести все устанавливаемые зависимости: пакеты, которые необходимы для адекватной работы вашей библиотеки
     "geopandas>=1.0.0,<2.0.0",
+    # практика 2: кварталы и метрики BlocksNet
+    "blocksnet[ipynb,torch]==1.0.0a9",
+    "ipykernel",   # запуск ноутбука в VS Code
+    "nbconvert",   # запуск ноутбука целиком из терминала
+    "plotly",      # графики в dashboard.html
 ]
 
 classifiers = [ # метаданные для описания проекта пользователям, например, на PyPI: какая лицензия, какое предназначение

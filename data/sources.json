@@ -1,0 +1,45 @@
+{
+  "boundary": {
+    "source": "OpenStreetMap / Nominatim",
+    "downloaded": "2026-10-16",
+    "count": 1
+  },
+  "osm_extract": {
+    "source": "OpenStreetMap API 0.6 /map (© участники OpenStreetMap, ODbL)",
+    "downloaded": "2026-10-16"
+  },
+  "roads": {
+    "source": "OpenStreetMap (выгрузка API)",
+    "downloaded": "2026-10-16",
+    "count": 247
+  },
+  "railways": {
+    "source": "OpenStreetMap (выгрузка API)",
+    "downloaded": "2026-10-16",
+    "count": 6
+  },
+  "water": {
+    "source": "OpenStreetMap (выгрузка API)",
+    "downloaded": "2026-10-16",
+    "count": 9
+  },
+  "landuse": {
+    "source": "OpenStreetMap (landuse=*)",
+    "downloaded": "2026-10-16",
+    "count": 105
+  },
+  "graph_walk": {
+    "source": "OSMnx graph_from_xml по выгрузке OpenStreetMap, пешеходная сеть, 5 км/ч",
+    "downloaded": "2026-10-16"
+  },
+  "buildings": {
+    "source": "OpenStreetMap (building=*)",
+    "downloaded": "2026-10-16",
+    "count": 681
+  },
+  "schools": {
+    "source": "OpenStreetMap (amenity=school)",
+    "downloaded": "2026-10-16",
+    "count": 6
+  }
+}
