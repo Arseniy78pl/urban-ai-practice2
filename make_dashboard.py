@@ -398,7 +398,7 @@ footer { color: var(--text-muted); font-size: 13px; text-align: center; padding:
 <section id="conclusions"><h2>Выводы</h2><ul class="list">__CONCLUSIONS__</ul></section>
 
 <section id="sources"><h2>Источники данных</h2><ul class="list">__SOURCES__</ul>
-<p class="note">Данные © участники OpenStreetMap, лицензия ODbL. Подложка карты © участники OpenStreetMap (для неё и для библиотеки карты Leaflet нужен интернет; графики работают без интернета).</p>
+<p class="note">Данные © участники OpenStreetMap, лицензия ODbL. Подложка карты © Esri (светлая, топографическая или спутник — переключатель в правом верхнем углу карты). Для подложки и библиотеки карты Leaflet нужен интернет, графики работают без интернета.</p>
 <h2 style="margin-top:18px">Ограничения</h2><ul class="list">__LIMITATIONS__</ul></section>
 </main>
 <footer>Страница собрана скриптом make_dashboard.py из файлов results/*.geojson. Расчёты — в ноутбуке practice02_chernogolovka.ipynb.</footer>
@@ -420,8 +420,18 @@ const catColors = () => [1,2,3,4,5,6,7,8].map(i => css("--series-" + i));
 // ---- карта
 const map = L.map("map", {scrollWheelZoom: false});
 map.fitBounds(L.geoJSON(BLOCKS).getBounds());  // сначала задаём вид, затем добавляем слои
-L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-  {attribution: "© участники OpenStreetMap", maxZoom: 19, opacity: 0.6}).addTo(map);
+// Подложки Esri: работают без ключа и при открытии файла двойным щелчком
+// (серверы tile.openstreetmap.org блокируют такие страницы, ответ 403)
+const ESRI = "https://server.arcgisonline.com/ArcGIS/rest/services/";
+const esri = (name, label) => L.tileLayer(ESRI + name + "/MapServer/tile/{z}/{y}/{x}",
+  {attribution: "Подложка © Esri" + (label ? ", " + label : ""), maxZoom: 19});
+const baseLayers = {
+  "Светлая": esri("Canvas/World_Light_Gray_Base", "HERE, Garmin, © участники OpenStreetMap"),
+  "Топографическая": esri("World_Topo_Map", "HERE, Garmin, © участники OpenStreetMap"),
+  "Спутник": esri("World_Imagery", "Maxar, Earthstar Geographics"),
+};
+baseLayers["Светлая"].addTo(map);
+L.control.layers(baseLayers, null, {position: "topright"}).addTo(map);
 L.geoJSON(BOUNDARY, {style: {color: "#d93025", weight: 2, fill: false}, interactive: false}).addTo(map);
 const linkLayer = L.geoJSON(LINKS, {style: {color: css("--text-secondary"), weight: 2, dashArray: "4 4"},
   onEachFeature: (f, l) => l.bindTooltip(`кв. ${f.properties.from} → кв. ${f.properties.to}: ${fmt(f.properties.seats, "мест")}, ${fmt(f.properties.time_min, "мин")}`)});

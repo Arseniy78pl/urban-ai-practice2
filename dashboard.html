@@ -6828,7 +6828,7 @@ footer { color: var(--text-muted); font-size: 13px; text-align: center; padding:
 <section id="conclusions"><h2>Выводы</h2><ul class="list"><li>Территория города (8.05 км²) разделена на 64 кварталов. Самая большая доля площади у функции «производственная» (62 %): это научный центр РАН и производственные зоны на востоке. Жилая функция занимает 16 %.</li><li>Население по модели — около 27 575 человек. В трёх самых населённых кварталах живёт 65% жителей: это многоэтажные микрорайоны в центре и на юго-западе. Оценка выше переписи 2021 г. (≈ 21 тыс.)  потому что жилыми считаются все здания «yes» в жилых зонах  включая гаражи и сараи.</li><li>Пешком между центрами кварталов в среднем 27.9 мин (медиана). Самые «центральные» кварталы по доступности с учётом площади — около 24 мин, окраинные — до 75 мин.</li><li>Обеспеченность школами по модели: строгая 38%, мягкая 38%. Значения совпадают, потому что все 1250 мест заняты детьми из соседних кварталов (до 15 мин), и на дальние кварталы мест не остаётся. Вся вместимость — оценка BlocksNet (250 мест на школу): в OSM вместимость не указана, реальные школы крупнее. Поэтому нехватка мест, скорее всего, преувеличена.</li><li>Застройка в целом разреженная: средний FSI застроенных кварталов 0.26. Spacematrix и «Стрелка» сходятся в главном: город состоит из малоэтажных нежилых кварталов (институты, промзоны) и нескольких средне- и многоэтажных жилых микрорайонов. Spacematrix делит их тоньше, «Стрелка» — по общей шкале для всех городов.</li></ul></section>
 
 <section id="sources"><h2>Источники данных</h2><ul class="list"><li><b>boundary</b>: OpenStreetMap / Nominatim, загружено 2026-10-16</li><li><b>osm_extract</b>: OpenStreetMap API 0.6 /map (© участники OpenStreetMap, ODbL), загружено 2026-10-16</li><li><b>roads</b>: OpenStreetMap (выгрузка API), загружено 2026-10-16</li><li><b>railways</b>: OpenStreetMap (выгрузка API), загружено 2026-10-16</li><li><b>water</b>: OpenStreetMap (выгрузка API), загружено 2026-10-16</li><li><b>landuse</b>: OpenStreetMap (landuse=*), загружено 2026-10-16</li><li><b>graph_walk</b>: OSMnx graph_from_xml по выгрузке OpenStreetMap, пешеходная сеть, 5 км/ч, загружено 2026-10-16</li><li><b>buildings</b>: OpenStreetMap (building=*), загружено 2026-10-16</li><li><b>schools</b>: OpenStreetMap (amenity=school), загружено 2026-10-16</li></ul>
-<p class="note">Данные © участники OpenStreetMap, лицензия ODbL. Подложка карты © участники OpenStreetMap (для неё и для библиотеки карты Leaflet нужен интернет; графики работают без интернета).</p>
+<p class="note">Данные © участники OpenStreetMap, лицензия ODbL. Подложка карты © Esri (светлая, топографическая или спутник — переключатель в правом верхнем углу карты). Для подложки и библиотеки карты Leaflet нужен интернет, графики работают без интернета.</p>
 <h2 style="margin-top:18px">Ограничения</h2><ul class="list"><li>Кварталы нарезаны по дорогам OSM с тегами из pipeline.ipynb, поэтому они крупнее реальных: внутриквартальные проезды (service) не режут территорию.</li><li>Пешеходный граф собран OSMnx из той же выгрузки OSM, время = длина / 5 км/ч. Рельеф, светофоры и закрытые территории не учитываются. Время считается между точками внутри кварталов, поэтому для больших кварталов оно завышено.</li><li>Этажность есть в OSM только у 54 % зданий, остальным присвоен 1 этаж (оценка BlocksNet).</li><li>Население = жилая площадь / 30 м² на человека: модельная оценка, а не статистика.</li><li>Вместимость всех школ оценена (в OSM нет тега capacity). Колонка «в т. ч. оценённая вместимость» показывает, сколько мест — оценка.</li><li>Данные OSM получены через API OpenStreetMap, потому что Overpass API во время работы был перегружен. Состав данных тот же.</li></ul></section>
 </main>
 <footer>Страница собрана скриптом make_dashboard.py из файлов results/*.geojson. Расчёты — в ноутбуке practice02_chernogolovka.ipynb.</footer>
@@ -6850,8 +6850,18 @@ const catColors = () => [1,2,3,4,5,6,7,8].map(i => css("--series-" + i));
 // ---- карта
 const map = L.map("map", {scrollWheelZoom: false});
 map.fitBounds(L.geoJSON(BLOCKS).getBounds());  // сначала задаём вид, затем добавляем слои
-L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-  {attribution: "© участники OpenStreetMap", maxZoom: 19, opacity: 0.6}).addTo(map);
+// Подложки Esri: работают без ключа и при открытии файла двойным щелчком
+// (серверы tile.openstreetmap.org блокируют такие страницы, ответ 403)
+const ESRI = "https://server.arcgisonline.com/ArcGIS/rest/services/";
+const esri = (name, label) => L.tileLayer(ESRI + name + "/MapServer/tile/{z}/{y}/{x}",
+  {attribution: "Подложка © Esri" + (label ? ", " + label : ""), maxZoom: 19});
+const baseLayers = {
+  "Светлая": esri("Canvas/World_Light_Gray_Base", "HERE, Garmin, © участники OpenStreetMap"),
+  "Топографическая": esri("World_Topo_Map", "HERE, Garmin, © участники OpenStreetMap"),
+  "Спутник": esri("World_Imagery", "Maxar, Earthstar Geographics"),
+};
+baseLayers["Светлая"].addTo(map);
+L.control.layers(baseLayers, null, {position: "topright"}).addTo(map);
 L.geoJSON(BOUNDARY, {style: {color: "#d93025", weight: 2, fill: false}, interactive: false}).addTo(map);
 const linkLayer = L.geoJSON(LINKS, {style: {color: css("--text-secondary"), weight: 2, dashArray: "4 4"},
   onEachFeature: (f, l) => l.bindTooltip(`кв. ${f.properties.from} → кв. ${f.properties.to}: ${fmt(f.properties.seats, "мест")}, ${fmt(f.properties.time_min, "мин")}`)});
